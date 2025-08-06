@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的点餐小程序</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome图标 -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 配置Tailwind自定义颜色 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        accent: '#F59E0B',
+                        dark: '#1F2937',
+                        light: '#F3F4F6'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .menu-item-shadow {
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            }
+            .cart-item {
+                @apply flex justify-between items-center p-3 border-b border-gray-200;
+            }
+            .btn-primary {
+                @apply bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300;
+            }
+            .btn-secondary {
+                @apply bg-secondary hover:bg-secondary/90 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-md fixed w-full top-0 z-50 transition-all duration-300">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-primary">我的点餐</h1>
+            <div class="relative">
+                <button id="cartBtn" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                    <i class="fa fa-shopping-cart text-xl text-dark"></i>
+                    <span id="cartCount" class="absolute -top-1 -right-1 bg-accent text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 pt-20 pb-24">
+        <!-- 餐厅信息 -->
+        <div class="bg-gradient-to-r from-primary to-primary/70 text-white rounded-xl p-6 mb-8 shadow-lg">
+            <h2 class="text-2xl font-bold mb-2">我的小厨房</h2>
+            <p class="opacity-90 mb-4">今日特色菜品，新鲜美味</p>
+            <div class="flex items-center text-sm">
+                <span class="mr-4"><i class="fa fa-clock-o mr-1"></i> 营业时间: 10:00-22:00</span>
+                <span><i class="fa fa-phone mr-1"></i> 联系电话: 123-4567-8910</span>
+            </div>
+        </div>
+
+        <!-- 菜单分类 -->
+        <div class="flex overflow-x-auto pb-2 mb-6 gap-2 hide-scrollbar">
+            <button class="category-btn bg-primary text-white px-4 py-2 rounded-full whitespace-nowrap">全部菜品</button>
+            <button class="category-btn bg-white text-dark px-4 py-2 rounded-full whitespace-nowrap">主食</button>
+            <button class="category-btn bg-white text-dark px-4 py-2 rounded-full whitespace-nowrap">小菜</button>
+            <button class="category-btn bg-white text-dark px-4 py-2 rounded-full whitespace-nowrap">汤品</button>
+            <button class="category-btn bg-white text-dark px-4 py-2 rounded-full whitespace-nowrap">饮品</button>
+        </div>
+
+        <!-- 菜品列表 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            <!-- 菜品项1 -->
+            <div class="bg-white rounded-xl overflow-hidden menu-item-shadow transform hover:-translate-y-1 transition-all duration-300">
+                <div class="relative">
+                    <img src="https://picsum.photos/seed/food1/300/200" alt="番茄炒蛋" class="w-full h-48 object-cover">
+                    <span class="absolute top-3 right-3 bg-accent text-white text-sm px-2 py-1 rounded">热卖</span>
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-lg">番茄炒蛋</h3>
+                        <span class="text-primary font-bold">¥18</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">经典家常菜，酸甜可口</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-500"><i class="fa fa-star text-yellow-400"></i> 4.8 (120)</span>
+                        <button class="add-to-cart btn-primary text-sm py-1 px-3" data-id="1" data-name="番茄炒蛋" data-price="18" data-img="https://picsum.photos/seed/food1/300/200">
+                            <i class="fa fa-plus mr-1"></i> 加入购物车
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 菜品项2 -->
+            <div class="bg-white rounded-xl overflow-hidden menu-item-shadow transform hover:-translate-y-1 transition-all duration-300">
+                <div class="relative">
+                    <img src="https://picsum.photos/seed/food2/300/200" alt="宫保鸡丁" class="w-full h-48 object-cover">
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-lg">宫保鸡丁</h3>
+                        <span class="text-primary font-bold">¥28</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">麻辣鲜香，口感丰富</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-500"><i class="fa fa-star text-yellow-400"></i> 4.9 (215)</span>
+                        <button class="add-to-cart btn-primary text-sm py-1 px-3" data-id="2" data-name="宫保鸡丁" data-price="28" data-img="https://picsum.photos/seed/food2/300/200">
+                            <i class="fa fa-plus mr-1"></i> 加入购物车
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 菜品项3 -->
+            <div class="bg-white rounded-xl overflow-hidden menu-item-shadow transform hover:-translate-y-1 transition-all duration-300">
+                <div class="relative">
+                    <img src="https://picsum.photos/seed/food3/300/200" alt="酸菜鱼" class="w-full h-48 object-cover">
+                    <span class="absolute top-3 right-3 bg-accent text-white text-sm px-2 py-1 rounded">招牌</span>
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-lg">酸菜鱼</h3>
+                        <span class="text-primary font-bold">¥58</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">鲜嫩爽滑，酸辣开胃</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-500"><i class="fa fa-star text-yellow-400"></i> 4.9 (328)</span>
+                        <button class="add-to-cart btn-primary text-sm py-1 px-3" data-id="3" data-name="酸菜鱼" data-price="58" data-img="https://picsum.photos/seed/food3/300/200">
+                            <i class="fa fa-plus mr-1"></i> 加入购物车
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 菜品项4 -->
+            <div class="bg-white rounded-xl overflow-hidden menu-item-shadow transform hover:-translate-y-1 transition-all duration-300">
+                <div class="relative">
+                    <img src="https://picsum.photos/seed/food4/300/200" alt="拍黄瓜" class="w-full h-48 object-cover">
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-lg">拍黄瓜</h3>
+                        <span class="text-primary font-bold">¥12</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">清爽解腻，开胃小菜</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-500"><i class="fa fa-star text-yellow-400"></i> 4.7 (96)</span>
+                        <button class="add-to-cart btn-primary text-sm py-1 px-3" data-id="4" data-name="拍黄瓜" data-price="12" data-img="https://picsum.photos/seed/food4/300/200">
+                            <i class="fa fa-plus mr-1"></i> 加入购物车
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 菜品项5 -->
+            <div class="bg-white rounded-xl overflow-hidden menu-item-shadow transform hover:-translate-y-1 transition-all duration-300">
+                <div class="relative">
+                    <img src="https://picsum.photos/seed/food5/300/200" alt="紫菜蛋花汤" class="w-full h-48 object-cover">
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-lg">紫菜蛋花汤</h3>
+                        <span class="text-primary font-bold">¥10</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">清淡可口，营养丰富</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-500"><i class="fa fa-star text-yellow-400"></i> 4.6 (78)</span>
+                        <button class="add-to-cart btn-primary text-sm py-1 px-3" data-id="5" data-name="紫菜蛋花汤" data-price="10" data-img="https://picsum.photos/seed/food5/300/200">
+                            <i class="fa fa-plus mr-1"></i> 加入购物车
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 菜品项6 -->
+            <div class="bg-white rounded-xl overflow-hidden menu-item-shadow transform hover:-translate-y-1 transition-all duration-300">
+                <div class="relative">
+                    <img src="https://picsum.photos/seed/food6/300/200" alt="可乐" class="w-full h-48 object-cover">
+                    <span class="absolute top-3 right-3 bg-green-500 text-white text-sm px-2 py-1 rounded">新品</span>
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-lg">可乐</h3>
+                        <span class="text-primary font-bold">¥6</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">冰镇可乐，清凉解渴</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-500"><i class="fa fa-star text-yellow-400"></i> 4.5 (56)</span>
+                        <button class="add-to-cart btn-primary text-sm py-1 px-3" data-id="6" data-name="可乐" data-price="6" data-img="https://picsum.photos/seed/food6/300/200">
+                            <i class="fa fa-plus mr-1"></i> 加入购物车
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 购物车侧边栏 -->
+    <div id="cartSidebar" class="fixed top-0 right-0 h-full w-full sm:w-96 bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300">
+        <div class="p-4 border-b">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold text-dark">购物车</h2>
+                <button id="closeCart" class="p-2 hover:bg-gray-100 rounded-full">
+                    <i class="fa fa-times text-dark"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 购物车内容 -->
+        <div id="cartItems" class="h-[calc(100%-160px)] overflow-y-auto p-4">
+            <div class="text-center text-gray-500 py-10" id="emptyCartMsg">
+                <i class="fa fa-shopping-cart text-4xl mb-3 opacity-30"></i>
+                <p>购物车是空的</p>
+                <p class="text-sm mt-1">快去添加美味的菜品吧</p>
+            </div>
+            <!-- 购物车项目将通过JS动态添加 -->
+        </div>
+        
+        <!-- 购物车底部 -->
+        <div class="p-4 border-t fixed bottom-0 right-0 w-full sm:w-96 bg-white">
+            <div class="flex justify-between mb-3">
+                <span class="font-medium">合计:</span>
+                <span id="totalPrice" class="font-bold text-xl text-primary">¥0</span>
+            </div>
+            <button id="submitOrder" class="btn-secondary w-full disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                提交订单
+            </button>
+        </div>
+    </div>
+
+    <!-- 订单成功弹窗 -->
+    <div id="orderSuccessModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4 transform transition-all">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-check text-2xl text-secondary"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2">订单提交成功！</h3>
+                <p class="text-gray-600 mb-6">您的订单已收到，我们将尽快为您准备</p>
+                <button id="closeOrderModal" class="btn-primary w-full">
+                    完成
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <footer class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-6">
+        <div class="flex justify-around items-center">
+            <a href="#" class="flex flex-col items-center text-primary">
+                <i class="fa fa-home text-xl"></i>
+                <span class="text-xs mt-1">首页</span>
+            </a>
+            <a href="#" class="flex flex-col items-center text-gray-500">
+                <i class="fa fa-list text-xl"></i>
+                <span class="text-xs mt-1">菜单</span>
+            </a>
+            <a href="#" class="flex flex-col items-center text-gray-500">
+                <i class="fa fa-history text-xl"></i>
+                <span class="text-xs mt-1">订单</span>
+            </a>
+            <a href="#" class="flex flex-col items-center text-gray-500">
+                <i class="fa fa-user text-xl"></i>
+                <span class="text-xs mt-1">我的</span>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        // 购物车数据
+        let cart = [];
+        
+        // DOM元素
+        const cartBtn = document.getElementById('cartBtn');
+        const closeCart = document.getElementById('closeCart');
+        const cartSidebar = document.getElementById('cartSidebar');
+        const cartItems = document.getElementById('cartItems');
+        const cartCount = document.getElementById('cartCount');
+        const totalPrice = document.getElementById('totalPrice');
+        const submitOrder = document.getElementById('submitOrder');
+        const emptyCartMsg = document.getElementById('emptyCartMsg');
+        const orderSuccessModal = document.getElementById('orderSuccessModal');
+        const closeOrderModal = document.getElementById('closeOrderModal');
+        const addToCartBtns = document.querySelectorAll('.add-to-cart');
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        
+        // 打开购物车
+        cartBtn.addEventListener('click', () => {
+            cartSidebar.classList.remove('translate-x-full');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        // 关闭购物车
+        closeCart.addEventListener('click', closeCartSidebar);
+        
+        function closeCartSidebar() {
+            cartSidebar.classList.add('translate-x-full');
+            document.body.style.overflow = '';
+        }
+        
+        // 关闭订单成功弹窗
+        closeOrderModal.addEventListener('click', () => {
+            orderSuccessModal.classList.add('hidden');
+        });
+        
+        // 添加到购物车
+        addToCartBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const name = this.getAttribute('data-name');
+                const price = parseFloat(this.getAttribute('data-price'));
+                const img = this.getAttribute('data-img');
+                
+                // 检查商品是否已在购物车中
+                const existingItem = cart.find(item => item.id === id);
+                
+                if (existingItem) {
+                    // 增加数量
+                    existingItem.quantity++;
+                } else {
+                    // 添加新商品
+                    cart.push({
+                        id,
+                        name,
+                        price,
+                        img,
+                        quantity: 1
+                    });
+                }
+                
+                // 更新购物车
+                updateCart();
+                
+                // 显示添加成功的动画效果
+                this.innerHTML = '<i class="fa fa-check mr-1"></i> 已添加';
+                this.classList.remove('bg-primary');
+                this.classList.add('bg-secondary');
+                
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fa fa-plus mr-1"></i> 加入购物车';
+                    this.classList.remove('bg-secondary');
+                    this.classList.add('bg-primary');
+                }, 1500);
+            });
+        });
+        
+        // 更新购物车
+        function updateCart() {
+            // 清空购物车列表
+            cartItems.innerHTML = '';
+            
+            // 更新购物车数量
+            const count = cart.reduce((total, item) => total + item.quantity, 0);
+            cartCount.textContent = count;
+            
+            // 更新总价
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            totalPrice.textContent = `¥${total.toFixed(2)}`;
+            
+            // 检查购物车是否为空
+            if (cart.length === 0) {
+                emptyCartMsg.classList.remove('hidden');
+                submitOrder.disabled = true;
+            } else {
+                emptyCartMsg.classList.add('hidden');
+                submitOrder.disabled = false;
+                
+                // 添加购物车项目
+                cart.forEach(item => {
+                    const cartItem = document.createElement('div');
+                    cartItem.className = 'cart-item';
+                    cartItem.innerHTML = `
+                        <div class="flex items-center">
+                            <img src="${item.img}" alt="${item.name}" class="w-12 h-12 object-cover rounded mr-3">
+                            <div>
+                                <h4 class="font-medium">${item.name}</h4>
+                                <p class="text-primary text-sm">¥${item.price}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <button class="decrease-quantity w-6 h-6 rounded-full border flex items-center justify-center text-gray-600" data-id="${item.id}">-</button>
+                            <span class="mx-3">${item.quantity}</span>
+                            <button class="increase-quantity w-6 h-6 rounded-full border flex items-center justify-center text-gray-600" data-id="${item.id}">+</button>
+                        </div>
+                    `;
+                    cartItems.appendChild(cartItem);
+                });
+                
+                // 添加数量增减事件监听
+                document.querySelectorAll('.decrease-quantity').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        const item = cart.find(item => item.id === id);
+                        
+                        if (item.quantity > 1) {
+                            item.quantity--;
+                        } else {
+                            // 从购物车中移除
+                            cart = cart.filter(item => item.id !== id);
+                        }
+                        
+                        updateCart();
+                    });
+                });
+                
+                document.querySelectorAll('.increase-quantity').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        const item = cart.find(item => item.id === id);
+                        item.quantity++;
+                        updateCart();
+                    });
+                });
+            }
+        }
+        
+        // 提交订单
+        submitOrder.addEventListener('click', () => {
+            // 显示订单成功弹窗
+            orderSuccessModal.classList.remove('hidden');
+            
+            // 清空购物车
+            cart = [];
+            updateCart();
+            
+            // 关闭购物车
+            closeCartSidebar();
+        });
+        
+        // 分类按钮点击事件
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // 移除所有按钮的选中状态
+                categoryBtns.forEach(b => {
+                    b.classList.remove('bg-primary', 'text-white');
+                    b.classList.add('bg-white', 'text-dark');
+                });
+                
+                // 设置当前按钮为选中状态
+                this.classList.remove('bg-white', 'text-dark');
+                this.classList.add('bg-primary', 'text-white');
+                
+                // 这里可以添加分类筛选逻辑
+            });
+        });
+        
+        // 初始化购物车
+        updateCart();
+    </script>
+</body>
+</html>
